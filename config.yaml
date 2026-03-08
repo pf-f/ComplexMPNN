@@ -1,0 +1,80 @@
+# ComplexMPNN训练配置文件
+# 所有参数均有注释说明
+
+# 数据路径配置
+data:
+  # MPNN .pt文件目录
+  mpnn_pt_dir: "data/processed/mpnn_pt"
+  # 数据集切分文件目录
+  split_dir: "data/splits"
+  # 训练集文件名
+  train_split: "train.txt"
+  # 验证集文件名
+  val_split: "val.txt"
+  # 测试集文件名
+  test_split: "test.txt"
+
+# 模型配置
+model:
+  # ProteinMPNN预训练权重路径
+  pretrained_weights_path: "checkpoints/proteinmpnn_v_48_020.pt"
+  # 是否冻结部分层（False表示全模型fine-tune）
+  freeze_layers: false
+
+# 损失函数配置
+loss:
+  # 界面残基权重
+  interface_weight: 3.0
+  # 非界面残基权重
+  non_interface_weight: 1.0
+
+# 训练配置
+training:
+  # 学习率
+  learning_rate: 1.0e-5
+  # 训练轮数
+  epochs: 10
+  # 批次大小（适配小批量数据）
+  batch_size: 2
+  # 优化器类型
+  optimizer: "AdamW"
+  # 权重衰减
+  weight_decay: 0.01
+  # 是否使用学习率调度
+  use_lr_scheduler: false
+  # 学习率调度器类型
+  lr_scheduler: "ReduceLROnPlateau"
+
+# 训练模式配置
+training_modes:
+  # 是否启用Fixed-chain mode（固定一条链，设计伴侣链）
+  fixed_chain_mode: true
+  # 是否启用Joint-design mode（多条链同时设计）
+  joint_design_mode: true
+  # 两种模式的混合比例（0-1之间，表示使用Fixed-chain mode的概率）
+  fixed_chain_probability: 0.5
+
+# 检查点配置
+checkpoint:
+  # 检查点保存目录
+  save_dir: "checkpoints"
+  # 检查点保存间隔（epoch数）
+  save_interval: 5
+  # 最佳模型保存路径
+  best_model_path: "checkpoints/best_complexmpnn.pt"
+
+# 日志配置
+logging:
+  # 日志文件路径
+  log_file: "logs/train.log"
+  # 训练日志打印间隔（batch数）
+  log_interval: 1
+  # 验证间隔（epoch数）
+  val_interval: 1
+
+# 随机种子配置
+random:
+  # 随机种子
+  seed: 42
+  # 是否使用确定性算法
+  deterministic: true
