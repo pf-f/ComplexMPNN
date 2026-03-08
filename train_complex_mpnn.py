@@ -415,6 +415,18 @@ def main():
         weight_decay=config['training']['weight_decay']
     )
     
+    # 创建学习率调度器
+    scheduler = None
+    if config['training']['use_lr_scheduler']:
+        if config['training']['lr_scheduler'] == 'ReduceLROnPlateau':
+            scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+                optimizer,
+                mode='min',
+                factor=0.5,
+                patience=5
+            )
+            print("使用学习率调度器: ReduceLROnPlateau")
+    
     # 训练循环
     best_val_loss = float('inf')
     
@@ -431,6 +443,10 @@ def main():
         if (epoch + 1) % config['logging']['val_interval'] == 0:
             val_loss = validate(model, val_dataloader, loss_fn, device)
             print(f"验证损失: {val_loss:.4f}")
+            
+            # 更新学习率调度器
+            if scheduler is not None:
+                scheduler.step(val_loss)
             
             # 保存最佳模型
             if val_loss < best_val_loss:

@@ -32,8 +32,8 @@ loss:
 training:
   # 学习率
   learning_rate: 1.0e-5
-  # 训练轮数
-  epochs: 10
+  # 训练轮数（全量数据训练）
+  epochs: 30
   # 批次大小（适配小批量数据）
   batch_size: 2
   # 优化器类型
@@ -41,7 +41,7 @@ training:
   # 权重衰减
   weight_decay: 0.01
   # 是否使用学习率调度
-  use_lr_scheduler: false
+  use_lr_scheduler: true
   # 学习率调度器类型
   lr_scheduler: "ReduceLROnPlateau"
 
