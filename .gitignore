@@ -76,3 +76,7 @@ logs_backup_*/
 # Translation scripts
 translate_to_english.py
 translate_full.py
+
+# Chinese documentation files
+release_checklist.md
+ComplexMPNN.md
