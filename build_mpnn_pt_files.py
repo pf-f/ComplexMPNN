@@ -35,7 +35,7 @@ def parse_pdb_structure(pdb_file):
     解析PDBfile结构
     
     Args:
-        pdb_file: PDBfile路径
+        pdb_file: PDBfilePath
     
     Returns:
         PDB结构对象
@@ -81,13 +81,13 @@ def get_chain_sequence(chain):
 
 def get_backbone_coords(chain):
     """
-    获取chain的backbone原子坐标
+    获取chain的backbone原子Coordinates
     
     Args:
         chain: PDBchain对象
     
     Returns:
-        backbone原子坐标数组 (N, 3, 3)，其中N是residue数，3是N、CA、C原子，3是坐标
+        backbone原子Coordinates数组 (N, 3, 3)，其中N是residue数，3是N、CA、C原子，3是Coordinates
     """
     coords = []
     
@@ -99,7 +99,7 @@ def get_backbone_coords(chain):
                 c = residue['C'].get_coord()
                 coords.append([n, ca, c])
             except KeyError:
-                # 如果原子不存在，Skip
+                # 如果原子不Exists，Skip
                 continue
     
     return np.array(coords)
@@ -110,8 +110,8 @@ def build_mpnn_pt_file(pdb_file, interface_dir, output_dir):
     BuildMPNN .ptfile
     
     Args:
-        pdb_file: PDBfile路径
-        interface_dir: 界面掩码directory
+        pdb_file: PDBfilePath
+        interface_dir: 界面Maskdirectory
         output_dir: outputdirectory
     """
     # 解析PDB结构
@@ -131,24 +131,24 @@ def build_mpnn_pt_file(pdb_file, interface_dir, output_dir):
         if not sequence:
             continue
         
-        # 获取backbone坐标
+        # 获取backboneCoordinates
         backbone_coords = get_backbone_coords(chain)
         if backbone_coords.shape[0] == 0:
             continue
         
-        # load界面掩码
+        # load界面Mask
         interface_mask_file = os.path.join(interface_dir, f"{pdb_id}_{chain_id}.npy")
         if os.path.exists(interface_mask_file):
             interface_mask = np.load(interface_mask_file)
-            # 确保掩码长度与sequence长度匹配
+            # 确保Mask长度与sequence长度匹配
             if len(interface_mask) != len(sequence):
-                # 如果不匹配，创建长度为sequence长度的全False掩码
+                # 如果不匹配，Create长度为sequence长度的全FalseMask
                 interface_mask = np.zeros(len(sequence), dtype=bool)
         else:
-            # 如果没有界面掩码file，创建全False掩码
+            # 如果没有界面Maskfile，Create全FalseMask
             interface_mask = np.zeros(len(sequence), dtype=bool)
         
-        # 创建MPNN数据字典
+        # CreateMPNNData字典
         data = {
             'sequence': sequence,
             'backbone_coords': torch.tensor(backbone_coords, dtype=torch.float32),
@@ -163,16 +163,16 @@ def build_mpnn_pt_file(pdb_file, interface_dir, output_dir):
 
 def main():
     """
-    主函数
+    主Function
     """
     parser = argparse.ArgumentParser(description='将PDBfile转换为ProteinMPNN可直接Train的.ptfile')
     parser.add_argument('--input_dir', required=True, help='inputPDBfiledirectory')
-    parser.add_argument('--interface_dir', default='data/processed/interface_masks', help='界面掩码directory')
+    parser.add_argument('--interface_dir', default='data/processed/interface_masks', help='界面Maskdirectory')
     parser.add_argument('--output_dir', default='data/processed/mpnn_pt', help='outputdirectory')
     
     args = parser.parse_args()
     
-    # 确保outputdirectory存在
+    # 确保outputdirectoryExists
     os.makedirs(args.output_dir, exist_ok=True)
     
     # 获取inputdirectory中的PDBfile

@@ -31,7 +31,7 @@ def get_resolution(pdb_file):
     从PDBfile中获取resolution
     
     Args:
-        pdb_file: PDBfile路径
+        pdb_file: PDBfilePath
     
     Returns:
         resolution值，如果Failed to get则返回None
@@ -57,7 +57,7 @@ def get_resolution(pdb_file):
 
 def get_chain_sequences(structure):
     """
-    获取结构中所有chain的sequence
+    获取结构中Allchain的sequence
     
     Args:
         structure: PDB结构对象
@@ -92,7 +92,7 @@ def get_chain_sequences(structure):
 
 def has_nucleic_acids(structure):
     """
-    检查结构中是否Contains DNA/RNA
+    Check结构中是否Contains DNA/RNA
     
     Args:
         structure: PDB结构对象
@@ -118,7 +118,7 @@ def filter_complex(pdb_file):
     筛选Meets criteria的复合物
     
     Args:
-        pdb_file: PDBfile路径
+        pdb_file: PDBfilePath
     
     Returns:
         bool: 如果Meets criteria则返回True，否则返回False
@@ -131,7 +131,7 @@ def filter_complex(pdb_file):
             parser = PDBParser()
         structure = parser.get_structure('structure', pdb_file)
         
-        # 检查是否Contains DNA/RNA
+        # Check是否Contains DNA/RNA
         if has_nucleic_acids(structure):
             print(f"{pdb_file} Contains DNA/RNA，Exclude")
             return False
@@ -146,12 +146,12 @@ def filter_complex(pdb_file):
         # 获取chainsequence
         chain_sequences = get_chain_sequences(structure)
         
-        # 检查至少2条不同sequence的蛋白chain
+        # Check至少2条不同sequence的蛋白chain
         if len(chain_sequences) < 2:
-            print(f"{pdb_file} 蛋白chain数量 < 2，Exclude")
+            print(f"{pdb_file} 蛋白chainCount < 2，Exclude")
             return False
         
-        # 检查是否有不同的sequence
+        # Check是否有不同的sequence
         unique_sequences = set(chain_sequences.values())
         if len(unique_sequences) < 2:
             print(f"{pdb_file} 没有不同sequence的蛋白chain，Exclude")
@@ -166,7 +166,7 @@ def filter_complex(pdb_file):
 
 def main():
     """
-    主函数
+    主Function
     """
     parser = argparse.ArgumentParser(description='筛选Meets criteria的heteromeric complexes')
     parser.add_argument('--input_dir', required=True, help='inputPDBfiledirectory')
@@ -174,7 +174,7 @@ def main():
     
     args = parser.parse_args()
     
-    # 确保outputdirectory存在
+    # 确保outputdirectoryExists
     os.makedirs(args.output_dir, exist_ok=True)
     
     # 获取inputdirectory中的PDBfile

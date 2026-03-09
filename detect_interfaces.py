@@ -29,13 +29,13 @@ warnings.filterwarnings('ignore', category=PDBConstructionWarning)
 
 def get_atom_coordinates(residue):
     """
-    获取residue的Cβ原子坐标（Gly使用Cα）
+    获取residue的Cβ原子Coordinates（Gly使用Cα）
     
     Args:
         residue: PDBresidue对象
     
     Returns:
-        原子坐标（x, y, z），如果没有则返回None
+        原子Coordinates（x, y, z），如果没有则返回None
     """
     try:
         if residue.get_resname() == 'GLY':
@@ -46,17 +46,17 @@ def get_atom_coordinates(residue):
             atom = residue['CB']
         return atom.get_coord()
     except KeyError:
-        # 如果原子不存在，返回None
+        # 如果原子不Exists，返回None
         return None
 
 
 def calculate_distance(coord1, coord2):
     """
-    计算两个原子坐标之间的距离
+    计算两个原子Coordinates之间的距离
     
     Args:
-        coord1: 第一个原子坐标
-        coord2: 第二个原子坐标
+        coord1: 第一个原子Coordinates
+        coord2: 第二个原子Coordinates
     
     Returns:
         距离值
@@ -72,9 +72,9 @@ def detect_interface(structure):
         structure: PDB结构对象
     
     Returns:
-        字典，键为chainID，值为interface residues掩码（numpy数组）
+        字典，键为chainID，值为interface residuesMask（numpy数组）
     """
-    # 获取所有chain
+    # 获取Allchain
     chains = list(structure.get_chains())
     num_chains = len(chains)
     
@@ -82,7 +82,7 @@ def detect_interface(structure):
     if num_chains < 2:
         return {}
     
-    # 为每个chain创建residue列表和坐标列表
+    # 为每个chainCreateresidue列表和Coordinates列表
     chain_residues = {}
     chain_coords = {}
     
@@ -106,10 +106,10 @@ def detect_interface(structure):
         chain1_residues = chain_residues[chain1_id]
         chain1_coords = chain_coords[chain1_id]
         
-        # 初始化界面掩码
+        # 初始化界面Mask
         mask = np.zeros(len(chain1_residues), dtype=bool)
         
-        # 检查与其他chain的距离
+        # Check与其他chain的距离
         for j, chain2 in enumerate(chains):
             if i == j:
                 continue
@@ -117,7 +117,7 @@ def detect_interface(structure):
             chain2_id = chain2.id
             chain2_coords = chain_coords[chain2_id]
             
-            # 计算chain1中每个residue与chain2中所有residue的距离
+            # 计算chain1中每个residue与chain2中Allresidue的距离
             for k, coord1 in enumerate(chain1_coords):
                 if coord1 is None:
                     continue
@@ -138,7 +138,7 @@ def detect_interface(structure):
 
 def main():
     """
-    主函数
+    主Function
     """
     parser = argparse.ArgumentParser(description='Detectprotein complexes中的interface residues')
     parser.add_argument('--input_dir', required=True, help='inputPDBfiledirectory')
@@ -146,7 +146,7 @@ def main():
     
     args = parser.parse_args()
     
-    # 确保outputdirectory存在
+    # 确保outputdirectoryExists
     os.makedirs(args.output_dir, exist_ok=True)
     
     # 获取inputdirectory中的PDBfile
@@ -170,7 +170,7 @@ def main():
             # Detectinterface residues
             interface_masks = detect_interface(structure)
             
-            # save界面掩码
+            # save界面Mask
             pdb_id = os.path.basename(pdb_file).split('_')[0]  # 假设file名格式为 {pdb_id}_assembly1.pdb
             
             for chain_id, mask in interface_masks.items():

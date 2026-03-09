@@ -2,11 +2,11 @@
 """
 interface_recovery.py
 
-Function：计算sequence恢复Metric，包括interface residues恢复率、非interface residues恢复率、Overall recovery
+Function：计算sequence恢复Metric，包括interface residues恢复率、Non-interface residues恢复率、Overall recovery
 支持与原始ProteinMPNN（未fine-tune）Baseline对比
 
 Core Rules：
-1. 仅使用测试集数据和Train好的模型checkpoint
+1. 仅使用Test集Data和Train好的Modelcheckpoint
 2. 计算3个核心Metric：Interface recovery、Non-interface recovery、Overall recovery
 3. 对比原始ProteinMPNN和ComplexMPNN的性能
 
@@ -30,11 +30,11 @@ def calculate_sequence_recovery(model, dataloader, device, config, use_joint_des
     计算sequence恢复Metric
     
     Args:
-        model: 模型
-        dataloader: 数据load器
+        model: Model
+        dataloader: Dataload器
         device: 设备
         config: 配置
-        use_joint_design: 是否使用Joint-design模式，False使用Fixed-chain模式
+        use_joint_design: 是否使用Joint-designMode，False使用Fixed-chainMode
         
     Returns:
         包含三个核心Metric的字典
@@ -74,13 +74,13 @@ def calculate_sequence_recovery(model, dataloader, device, config, use_joint_des
                 interface_mask_tensor = interface_mask.to(device)
                 interface_mask_tensor = interface_mask_tensor.unsqueeze(0)
                 
-                # 根据模式选择fixed_mask
+                # 根据Mode选择fixed_mask
                 if use_joint_design:
-                    # Joint-design mode: 所有residue都可以设计
+                    # Joint-design mode: Allresidue都可以设计
                     fixed_mask = torch.zeros_like(interface_mask_tensor, dtype=torch.bool)
                 else:
-                    # Fixed-chain mode: 固定interface residues，设计非interface residues（或者反过来）
-                    # 这里简化Processing，固定非interface residues，设计interface residues
+                    # Fixed-chain mode: Fixedinterface residues，设计Non-interface residues（或者反过来）
+                    # 这里简化Processing，FixedNon-interface residues，设计interface residues
                     fixed_mask = ~interface_mask_tensor
                 
                 # 前向传播获取logits
@@ -99,7 +99,7 @@ def calculate_sequence_recovery(model, dataloader, device, config, use_joint_des
                 total_interface_correct += interface_correct
                 total_interface_residues += interface_flat.sum().item()
                 
-                # 非interface residues
+                # Non-interface residues
                 non_interface_flat = ~interface_flat
                 non_interface_correct = (seq_idx_flat[non_interface_flat] == pred_idx_flat[non_interface_flat]).sum().item()
                 total_non_interface_correct += non_interface_correct
@@ -127,17 +127,17 @@ def calculate_sequence_recovery(model, dataloader, device, config, use_joint_des
 
 def main():
     """
-    主函数
+    主Function
     """
     parser = argparse.ArgumentParser(description='计算sequence恢复Metric')
-    parser.add_argument('--ckpt', type=str, required=True, help='模型checkpoint路径')
-    parser.add_argument('--config', type=str, default='config.yaml', help='配置file路径')
+    parser.add_argument('--ckpt', type=str, required=True, help='ModelcheckpointPath')
+    parser.add_argument('--config', type=str, default='config.yaml', help='配置filePath')
     parser.add_argument('--test_split', type=str, default='test.txt', help='testSplitfile名')
     parser.add_argument('--output_dir', type=str, default='logs/evaluation', help='outputdirectory')
     
     args = parser.parse_args()
     
-    # 创建outputdirectory
+    # Createoutputdirectory
     os.makedirs(args.output_dir, exist_ok=True)
     
     # load配置
@@ -150,7 +150,7 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")
     
-    # 创建测试数据集和数据load器
+    # CreateTestData集和Dataload器
     from train_complex_mpnn import collate_fn
     test_dataset = ComplexMPNNDataSet(
         config['data']['mpnn_pt_dir'],
@@ -165,18 +165,18 @@ def main():
     )
     print(f"Test set size: {len(test_dataset)}")
     
-    # 创建模型
+    # CreateModel
     print("\n=== loadComplexMPNN（fine-tune后）===")
     model_complex = ProteinMPNNWrapper()
     model_complex.load_state_dict(torch.load(args.ckpt, map_location=device))
     model_complex = model_complex.to(device)
-    print(f"Successload模型: {args.ckpt}")
+    print(f"SuccessloadModel: {args.ckpt}")
     
-    # 创建"原始ProteinMPNN"（这里简化为随机初始化的模型作为Baseline）
+    # Create"原始ProteinMPNN"（这里简化为Random初始化的Model作为Baseline）
     print("\n=== load原始ProteinMPNN（Baseline）===")
     model_baseline = ProteinMPNNWrapper()
     model_baseline = model_baseline.to(device)
-    print("使用随机初始化模型作为Baseline（实际应load未fine-tune的预Trainweights）")
+    print("使用Random初始化Model作为Baseline（实际应load未fine-tune的预Trainweights）")
     
     # 计算ComplexMPNN的Metric
     print("\n=== 计算ComplexMPNN的sequence恢复Metric ===")

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 完整的大规模Train自动化脚本
-确保所有步骤都能Complete
+确保All步骤都能Complete
 """
 
 import os
@@ -33,7 +33,7 @@ def run_step(cmd, step_name, log_file):
 
 
 def main():
-    # 创建日志directory
+    # Create日志directory
     os.makedirs('logs', exist_ok=True)
     main_log = 'logs/complete_large_scale_training.log'
     
@@ -62,14 +62,14 @@ def main():
     # 步骤3: Cluster和Split
     step3 = run_step(
         "python cluster_and_split.py --input_dir data/processed/mpnn_pt --output_dir data/splits",
-        "Cluster和数据集Split",
+        "Cluster和Data集Split",
         main_log
     )
     if not step3:
         print("\nClusterSplitFailed，但尝试Continue...")
     
-    # 步骤4: 清理旧checkpoints
-    print("\n清理旧checkpoint...")
+    # 步骤4: Cleanup旧checkpoints
+    print("\nCleanup旧checkpoint...")
     import glob
     for f in glob.glob('checkpoints/*.pt'):
         try:
@@ -85,7 +85,7 @@ def main():
     
     step5 = run_step(
         "python train_complex_mpnn.py --config config.yaml",
-        "GPUTrain模型",
+        "GPUTrainModel",
         main_log
     )
     
@@ -93,10 +93,10 @@ def main():
     print("\n" + "="*70)
     if step5:
         print("✓ 全流程Complete！")
-        print("模型save在 checkpoints/")
+        print("Modelsave在 checkpoints/")
         print("best_model: checkpoints/best_complexmpnn.pt")
     else:
-        print("✗ Train可能Failed，请检查日志")
+        print("✗ Train可能Failed，请Check日志")
     print("="*70)
     
     return 0 if step5 else 1

@@ -29,7 +29,7 @@ def fetch_biological_assembly(pdb_id, output_dir):
         pdb_id: PDB ID字符串
         output_dir: outputdirectory
     """
-    # 确保outputdirectory存在
+    # 确保outputdirectoryExists
     os.makedirs(output_dir, exist_ok=True)
     
     try:
@@ -56,7 +56,7 @@ def fetch_biological_assembly(pdb_id, output_dir):
             print(f"SuccessDownload {pdb_id} 的第一个biological assembly到 {output_file}")
             return output_file
         else:
-            # 如果压缩file不存在，尝试直接Download标准PDBfile
+            # 如果压缩file不Exists，尝试直接Download标准PDBfile
             url_pdb = f"https://files.rcsb.org/download/{pdb_id.upper()}.pdb"
             response_pdb = requests.get(url_pdb)
             if response_pdb.status_code == 200:
@@ -74,7 +74,7 @@ def fetch_biological_assembly(pdb_id, output_dir):
 
 def main():
     """
-    主函数
+    主Function
     """
     parser = argparse.ArgumentParser(description='DownloadPDB biological assemblies')
     parser.add_argument('--pdb_list', required=True, help='包含PDB ID列表的文本file')

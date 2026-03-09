@@ -23,12 +23,12 @@ def fetch_biological_assembly(pdb_id, output_dir, max_retries=3):
         max_retries: 最大重试次数
     
     Returns:
-        (pdb_id, success, output_file或Error信息)
+        (pdb_id, success, output_file或ErrorInformation)
     """
     pdb_id = pdb_id.upper()
     output_file = os.path.join(output_dir, f"{pdb_id.lower()}_assembly1.pdb")
     
-    # 如果file已存在，Skip
+    # 如果file已Exists，Skip
     if os.path.exists(output_file):
         return (pdb_id, True, output_file)
     
@@ -77,7 +77,7 @@ def main():
     parser.add_argument('--pdb_list', required=True, help='包含PDB ID列表的文本file')
     parser.add_argument('--output_dir', default='data/raw_pdb', help='outputdirectory')
     parser.add_argument('--max_workers', type=int, default=10, help='并发线程数')
-    parser.add_argument('--limit', type=int, default=None, help='限制Download数量（用于测试）')
+    parser.add_argument('--limit', type=int, default=None, help='限制DownloadCount（用于Test）')
     
     args = parser.parse_args()
     
@@ -93,14 +93,14 @@ def main():
     print(f"准备Download {len(pdb_ids)} 个PDBfile")
     print(f"使用 {args.max_workers} 个并发线程")
     
-    # 统计已存在的file
+    # 统计已Exists的file
     existing = 0
     for pdb_id in pdb_ids:
         output_file = os.path.join(args.output_dir, f"{pdb_id.lower()}_assembly1.pdb")
         if os.path.exists(output_file):
             existing += 1
     
-    print(f"已存在 {existing} 个file，需要Download {len(pdb_ids) - existing} 个")
+    print(f"已Exists {existing} 个file，需要Download {len(pdb_ids) - existing} 个")
     
     # 多线程Download
     success_count = 0

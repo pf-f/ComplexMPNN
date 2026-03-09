@@ -5,7 +5,7 @@ run_af_multimer.py
 Function：对接AlphaFold-Multimer，input设计的蛋白质sequence→结构预测→计算RMSD、TM-score、ipTM
 
 Core Rules：
-1. input模型设计的蛋白质sequence
+1. inputModel设计的蛋白质sequence
 2. 使用AlphaFold-Multimer预测复合物结构
 3. 计算3个结构Metric：RMSD、TM-score、ipTM
 4. 对比原始结构和预测结构的相似度
@@ -33,14 +33,14 @@ def calculate_rmsd(coords1, coords2):
     计算RMSD (Root Mean Square Deviation)
     
     Args:
-        coords1: 第一个结构的坐标 (N, 3)
-        coords2: 第二个结构的坐标 (N, 3)
+        coords1: 第一个结构的Coordinates (N, 3)
+        coords2: 第二个结构的Coordinates (N, 3)
         
     Returns:
         RMSD值
     """
-    # 确保形状相同
-    assert coords1.shape == coords2.shape, "坐标形状必须相同"
+    # 确保Shape相同
+    assert coords1.shape == coords2.shape, "CoordinatesShape必须相同"
     
     # Calculate distance平方
     diff = coords1 - coords2
@@ -56,8 +56,8 @@ def calculate_tm_score(coords1, coords2, seq_len=None):
     计算TM-score (Template Modeling Score)
     
     Args:
-        coords1: 第一个结构的坐标 (N, 3)
-        coords2: 第二个结构的坐标 (N, 3)
+        coords1: 第一个结构的Coordinates (N, 3)
+        coords2: 第二个结构的Coordinates (N, 3)
         seq_len: sequence长度（用于归一化）
         
     Returns:
@@ -86,9 +86,9 @@ def calculate_iptm(chain_coords1, chain_coords2, interface_mask=None):
     计算ipTM (interface Template Modeling Score)
     
     Args:
-        chain_coords1: 第一个结构的多chain坐标 (chain_id -> (N, 3))
-        chain_coords2: 第二个结构的多chain坐标 (chain_id -> (N, 3))
-        interface_mask: 界面掩码，用于聚焦界面区域
+        chain_coords1: 第一个结构的多chainCoordinates (chain_id -> (N, 3))
+        chain_coords2: 第二个结构的多chainCoordinates (chain_id -> (N, 3))
+        interface_mask: 界面Mask，用于聚焦界面区域
         
     Returns:
         ipTM值
@@ -96,7 +96,7 @@ def calculate_iptm(chain_coords1, chain_coords2, interface_mask=None):
     说明：
     ipTM专门Evaluate复合物界面区域的结构质量
     """
-    # 合并所有chain的坐标
+    # 合并Allchain的Coordinates
     all_coords1 = []
     all_coords2 = []
     
@@ -116,7 +116,7 @@ def calculate_iptm(chain_coords1, chain_coords2, interface_mask=None):
     all_coords1 = np.concatenate(all_coords1, axis=0)
     all_coords2 = np.concatenate(all_coords2, axis=0)
     
-    # 如果有界面掩码，只计算界面区域
+    # 如果有界面Mask，只计算界面区域
     if interface_mask is not None and len(interface_mask) == len(all_coords1):
         all_coords1 = all_coords1[interface_mask]
         all_coords2 = all_coords2[interface_mask]
@@ -133,28 +133,28 @@ def predict_structure_with_af_multimer(sequences, output_dir, af_multimer_path=N
     Args:
         sequences: sequence列表，每条sequence代表一条chain
         output_dir: outputdirectory
-        af_multimer_path: AlphaFold-Multimer路径（可选）
+        af_multimer_path: AlphaFold-MultimerPath（可选）
         
     Returns:
-        预测结构的file路径和Metric
+        预测结构的filePath和Metric
         
     说明：
     这里提供框架代码，实际使用时需要：
     1. 正确安装AlphaFold-Multimer
-    2. 准备相关数据库
+    2. 准备相关Data库
     3. 调用实际的AlphaFold-Multimer命令
     """
     os.makedirs(output_dir, exist_ok=True)
     
     print("=== AlphaFold-Multimer结构预测 ===")
-    print(f"inputsequence数量: {len(sequences)}")
+    print(f"inputsequenceCount: {len(sequences)}")
     for i, seq in enumerate(sequences):
         print(f"  chain {i+1}: {seq[:50]}..." if len(seq) > 50 else f"  chain {i+1}: {seq}")
     
     # 这里提供一个模拟的实现
     # 实际应该调用AlphaFold-Multimer
     
-    # 创建模拟的outputfile
+    # Create模拟的outputfile
     dummy_pdb_path = os.path.join(output_dir, "predicted_structure.pdb")
     
     # 写入一个简单的PDBfile头（模拟）
@@ -182,8 +182,8 @@ def evaluate_structure_quality(predicted_coords, native_coords, chain_ids=None):
     Evaluate预测结构的质量
     
     Args:
-        predicted_coords: 预测结构的坐标
-        native_coords: 天然结构的坐标
+        predicted_coords: 预测结构的Coordinates
+        native_coords: 天然结构的Coordinates
         chain_ids: chainID列表
         
     Returns:
@@ -215,7 +215,7 @@ def evaluate_structure_quality(predicted_coords, native_coords, chain_ids=None):
 
 def main():
     """
-    主函数
+    主Function
     """
     parser = argparse.ArgumentParser(description='AlphaFold-Multimer结构预测和Evaluate')
     parser.add_argument('--sequences', type=str, required=True, 
@@ -223,7 +223,7 @@ def main():
     parser.add_argument('--output_dir', type=str, default='logs/evaluation/af_output',
                        help='outputdirectory')
     parser.add_argument('--af_multimer_path', type=str, default=None,
-                       help='AlphaFold-Multimer路径（可选）')
+                       help='AlphaFold-MultimerPath（可选）')
     
     args = parser.parse_args()
     
@@ -231,7 +231,7 @@ def main():
     sequences = args.sequences.split(';')
     sequences = [seq.strip() for seq in sequences if seq.strip()]
     
-    # 创建outputdirectory
+    # Createoutputdirectory
     os.makedirs(args.output_dir, exist_ok=True)
     
     # 使用AlphaFold-Multimer预测结构

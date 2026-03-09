@@ -35,7 +35,7 @@ def run_command(cmd, description, log_file=None):
 
 
 def main():
-    # 创建日志directory
+    # Create日志directory
     os.makedirs('logs', exist_ok=True)
     main_log = 'logs/large_scale_pipeline.log'
     
@@ -43,7 +43,7 @@ def main():
     print("ComplexMPNN 大规模Train全流程")
     print("="*60)
     
-    # 步骤1: DownloadPDB（先Download500个测试）
+    # 步骤1: DownloadPDB（先Download500个Test）
     step1 = run_command(
         "python fetch_large_scale_assemblies.py --pdb_list large_pdb_ids.txt --output_dir data/raw_pdb --max_workers 15 --limit 500",
         "Download500个PDBfile",
@@ -86,14 +86,14 @@ def main():
     # 步骤5: Cluster和Split
     step5 = run_command(
         "python cluster_and_split.py --input_dir data/processed/mpnn_pt --output_dir data/splits",
-        "Cluster和数据集Split",
+        "Cluster和Data集Split",
         main_log
     )
     if not step5:
         print("ClusterSplitFailed，停止执行")
         return 1
     
-    # 步骤6: Train模型（GPU）
+    # 步骤6: TrainModel（GPU）
     print("\n" + "="*60)
     print("StartGPUTrain...")
     print("="*60)
@@ -108,14 +108,14 @@ def main():
     
     step6 = run_command(
         "python train_complex_mpnn.py --config config.yaml",
-        "GPUTrain模型",
+        "GPUTrainModel",
         main_log
     )
     
     print("\n" + "="*60)
     if step6:
         print("✓ 全流程Complete！")
-        print("模型save在 checkpoints/")
+        print("Modelsave在 checkpoints/")
     else:
         print("✗ TrainFailed")
     print("="*60)

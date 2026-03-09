@@ -34,7 +34,7 @@ def parse_sequence_recovery_results(results_path):
     解析sequence恢复结果
     
     Args:
-        results_path: sequence_recovery_results.pt file路径
+        results_path: sequence_recovery_results.pt filePath
         
     Returns:
         解析后的结果字典
@@ -67,7 +67,7 @@ def parse_af_multimer_results(results_path):
     解析AlphaFold-Multimer结果
     
     Args:
-        results_path: af_multimer_results.pt file路径
+        results_path: af_multimer_results.pt filePath
         
     Returns:
         解析后的结果字典
@@ -94,7 +94,7 @@ def plot_sequence_recovery_comparison(parsed_data, output_dir):
     绘制sequence恢复Metric对比柱状图
     
     Args:
-        parsed_data: 解析后的sequence恢复数据
+        parsed_data: 解析后的sequence恢复Data
         output_dir: outputdirectory
     """
     print("生成sequence恢复Metric对比图...")
@@ -143,7 +143,7 @@ def plot_af_metrics(parsed_data, output_dir):
     绘制AlphaFold-MultimerMetric图
     
     Args:
-        parsed_data: 解析后的AF-Multimer数据
+        parsed_data: 解析后的AF-MultimerData
         output_dir: outputdirectory
     """
     print("生成AF-MultimerMetric图...")
@@ -179,8 +179,8 @@ def export_to_csv(parsed_recovery, parsed_af, output_dir):
     将结果导出为CSV格式
     
     Args:
-        parsed_recovery: 解析后的sequence恢复数据
-        parsed_af: 解析后的AF-Multimer数据
+        parsed_recovery: 解析后的sequence恢复Data
+        parsed_af: 解析后的AF-MultimerData
         output_dir: outputdirectory
     """
     print("导出CSV格式结果...")
@@ -239,8 +239,8 @@ def print_summary(parsed_recovery, parsed_af):
     打印Evaluate结果摘要
     
     Args:
-        parsed_recovery: 解析后的sequence恢复数据
-        parsed_af: 解析后的AF-Multimer数据
+        parsed_recovery: 解析后的sequence恢复Data
+        parsed_af: 解析后的AF-MultimerData
     """
     print("\n" + "="*70)
     print("Evaluate结果摘要")
@@ -264,22 +264,22 @@ def print_summary(parsed_recovery, parsed_af):
 
 def main():
     """
-    主函数
+    主Function
     """
     parser = argparse.ArgumentParser(description='解析Evaluate结果、生成可视化、导出CSV')
     parser.add_argument('--recovery_path', type=str, 
                        default='logs/evaluation/sequence_recovery_results.pt',
-                       help='sequence恢复结果路径')
+                       help='sequence恢复结果Path')
     parser.add_argument('--af_path', type=str, 
                        default='logs/evaluation/af_output/af_multimer_results.pt',
-                       help='AF-Multimer结果路径')
+                       help='AF-Multimer结果Path')
     parser.add_argument('--output_dir', type=str, 
                        default='logs/evaluation',
                        help='outputdirectory')
     
     args = parser.parse_args()
     
-    # 创建outputdirectory
+    # Createoutputdirectory
     os.makedirs(args.output_dir, exist_ok=True)
     
     # 解析结果
@@ -287,9 +287,9 @@ def main():
     if os.path.exists(args.recovery_path):
         parsed_recovery = parse_sequence_recovery_results(args.recovery_path)
     else:
-        print(f"Warning: sequence恢复结果file不存在: {args.recovery_path}")
-        # 创建模拟数据用于测试
-        print("使用模拟数据进行测试...")
+        print(f"Warning: sequence恢复结果file不Exists: {args.recovery_path}")
+        # Create模拟Data用于Test
+        print("使用模拟Data进行Test...")
         parsed_recovery = {
             'metrics': ['Interface recovery', 'Non-interface recovery', 'Overall recovery'],
             'ComplexMPNN': [0.35, 0.28, 0.30],
@@ -300,9 +300,9 @@ def main():
     if os.path.exists(args.af_path):
         parsed_af = parse_af_multimer_results(args.af_path)
     else:
-        print(f"Warning: AF-Multimer结果file不存在: {args.af_path}")
-        # 创建模拟数据用于测试
-        print("使用模拟数据进行测试...")
+        print(f"Warning: AF-Multimer结果file不Exists: {args.af_path}")
+        # Create模拟Data用于Test
+        print("使用模拟Data进行Test...")
         parsed_af = {
             'metrics': ['RMSD (Å)', 'TM-score', 'ipTM'],
             'values': [2.5, 0.75, 0.70]

@@ -2,13 +2,13 @@
 """
 train_complex_mpnn.py
 
-Function：TrainComplexMPNN模型，支持两种Train模式
+Function：TrainComplexMPNNModel，支持两种TrainMode
 
 Core Rules：
-1. Fork ProteinMPNN官方仓库，不修改任何模型架构
+1. Fork ProteinMPNN官方仓库，不修改任何Model架构
 2. 支持Fixed-chain mode和Joint-design mode
-3. 使用interface-weighted cross entropyloss函数
-4. learning rate1e-5，Train10epoch，全模型fine-tune
+3. 使用interface-weighted cross entropylossFunction
+4. learning rate1e-5，Train10epoch，全Modelfine-tune
 
 Dependencies：
 - torch
@@ -33,10 +33,10 @@ from loss_functions import InterfaceWeightedCrossEntropyLoss
 
 def set_random_seed(seed, deterministic=True):
     """
-    设置随机种子
+    设置RandomSeed
     
     Args:
-        seed: 随机种子
+        seed: RandomSeed
         deterministic: 是否使用确定性算法
     """
     random.seed(seed)
@@ -55,7 +55,7 @@ def load_config(config_path):
     load配置file
     
     Args:
-        config_path: 配置file路径
+        config_path: 配置filePath
     
     Returns:
         配置字典
@@ -67,17 +67,17 @@ def load_config(config_path):
 
 class ComplexMPNNDataSet(Dataset):
     """
-    ComplexMPNN数据集
+    ComplexMPNNData集
     """
     
     def __init__(self, mpnn_pt_dir, split_file, split_dir):
         """
-        初始化数据集
+        初始化Data集
         
         Args:
             mpnn_pt_dir: MPNN .ptfiledirectory
-            split_file: 数据集Splitfile名
-            split_dir: 数据集Splitfiledirectory
+            split_file: Data集Splitfile名
+            split_dir: Data集Splitfiledirectory
         """
         self.mpnn_pt_dir = mpnn_pt_dir
         
@@ -88,24 +88,24 @@ class ComplexMPNNDataSet(Dataset):
     
     def __len__(self):
         """
-        返回数据集大小
+        返回Data集Size
         """
         return len(self.file_list)
     
     def __getitem__(self, idx):
         """
-        获取数据项
+        获取Data项
         
         Args:
             idx: 索引
         
         Returns:
-            数据项
+            Data项
         """
         file_name = self.file_list[idx]
         file_path = os.path.join(self.mpnn_pt_dir, file_name)
         
-        # load数据
+        # loadData
         data = torch.load(file_path)
         
         return {
@@ -118,13 +118,13 @@ class ComplexMPNNDataSet(Dataset):
 
 def collate_fn(batch):
     """
-    数据批Processing函数
+    Data批ProcessingFunction
     
     Args:
-        batch: batch数据
+        batch: batchData
     
     Returns:
-        Processing后的batch数据
+        Processing后的batchData
     """
     # 简单的批Processing，由于sequence长度不同，我们逐个Processing
     return batch
@@ -143,16 +143,16 @@ class ProteinMPNNWrapper(nn.Module):
         初始化ProteinMPNN包装器
         
         Args:
-            pretrained_weights_path: 预Trainweights路径
+            pretrained_weights_path: 预TrainweightsPath
         """
         super().__init__()
         
         # 注意：这里只是一个占位符，实际使用时需要：
         # 1. Fork ProteinMPNN官方仓库: https://github.com/dauparas/ProteinMPNN
-        # 2. 正确导入和初始化模型
+        # 2. 正确导入和初始化Model
         # 3. load预Trainweights
         
-        # 创建一个简单的模型用于演示
+        # Create一个简单的Model用于演示
         vocab_size = 21  # 20种amino acid + 1个未知
         hidden_size = 128
         num_layers = 3
@@ -182,8 +182,8 @@ class ProteinMPNNWrapper(nn.Module):
         
         Args:
             sequence: sequence（amino acid索引）
-            backbone_coords: backbone坐标
-            fixed_mask: 固定掩码，True表示固定residue
+            backbone_coords: backboneCoordinates
+            fixed_mask: FixedMask，True表示Fixedresidue
         
         Returns:
             logits
@@ -208,9 +208,9 @@ def train_epoch(model, dataloader, loss_fn, optimizer, device, config):
     Train一个epoch
     
     Args:
-        model: 模型
-        dataloader: 数据load器
-        loss_fn: loss函数
+        model: Model
+        dataloader: Dataload器
+        loss_fn: lossFunction
         optimizer: optimizer
         device: 设备
         config: 配置
@@ -249,14 +249,14 @@ def train_epoch(model, dataloader, loss_fn, optimizer, device, config):
             interface_mask_tensor = interface_mask.to(device)
             interface_mask_tensor = interface_mask_tensor.unsqueeze(0)  # (1, seq_len)
             
-            # 随机选择Train模式
+            # Random选择TrainMode
             use_fixed_chain = random.random() < config['training_modes']['fixed_chain_probability']
             
             if use_fixed_chain and config['training_modes']['fixed_chain_mode']:
-                # Fixed-chain mode: 随机选择一些residue固定
+                # Fixed-chain mode: Random选择一些residueFixed
                 fixed_mask = torch.rand(interface_mask_tensor.shape, device=interface_mask_tensor.device) < 0.5
             else:
-                # Joint-design mode: 所有residue都可以设计
+                # Joint-design mode: Allresidue都可以设计
                 fixed_mask = torch.zeros_like(interface_mask_tensor, dtype=torch.bool)
             
             # 前向传播
@@ -270,7 +270,7 @@ def train_epoch(model, dataloader, loss_fn, optimizer, device, config):
             
             batch_loss += loss.item()
         
-        # 更新参数
+        # 更新Parameter
         optimizer.step()
         
         total_loss += batch_loss / len(batch)
@@ -286,16 +286,16 @@ def train_epoch(model, dataloader, loss_fn, optimizer, device, config):
 
 def validate(model, dataloader, loss_fn, device):
     """
-    验证模型
+    VerifyModel
     
     Args:
-        model: 模型
-        dataloader: 数据load器
-        loss_fn: loss函数
+        model: Model
+        dataloader: Dataload器
+        loss_fn: lossFunction
         device: 设备
     
     Returns:
-        平均验证loss
+        平均Verifyloss
     """
     model.eval()
     total_loss = 0.0
@@ -344,10 +344,10 @@ def validate(model, dataloader, loss_fn, device):
 
 def main():
     """
-    主函数
+    主Function
     """
-    parser = argparse.ArgumentParser(description='TrainComplexMPNN模型')
-    parser.add_argument('--config', default='config.yaml', help='配置file路径')
+    parser = argparse.ArgumentParser(description='TrainComplexMPNNModel')
+    parser.add_argument('--config', default='config.yaml', help='配置filePath')
     
     args = parser.parse_args()
     
@@ -360,7 +360,7 @@ def main():
         config['random']['deterministic']
     )
     
-    # 创建必要的directory
+    # Create必要的directory
     os.makedirs(config['checkpoint']['save_dir'], exist_ok=True)
     os.makedirs(os.path.dirname(config['logging']['log_file']), exist_ok=True)
     
@@ -368,7 +368,7 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")
     
-    # 创建数据集和数据load器
+    # CreateData集和Dataload器
     train_dataset = ComplexMPNNDataSet(
         config['data']['mpnn_pt_dir'],
         config['data']['train_split'],
@@ -395,27 +395,27 @@ def main():
         collate_fn=collate_fn
     )
     
-    print(f"Train集大小: {len(train_dataset)}")
+    print(f"Train集Size: {len(train_dataset)}")
     print(f"Validation set size: {len(val_dataset)}")
     
-    # 创建模型
+    # CreateModel
     model = ProteinMPNNWrapper(config['model']['pretrained_weights_path'])
     model = model.to(device)
     
-    # 创建loss函数
+    # CreatelossFunction
     loss_fn = InterfaceWeightedCrossEntropyLoss(
         interface_weight=config['loss']['interface_weight'],
         non_interface_weight=config['loss']['non_interface_weight']
     )
     
-    # 创建optimizer
+    # Createoptimizer
     optimizer = optim.AdamW(
         model.parameters(),
         lr=config['training']['learning_rate'],
         weight_decay=config['training']['weight_decay']
     )
     
-    # 创建learning ratescheduler
+    # Createlearning ratescheduler
     scheduler = None
     if config['training']['use_lr_scheduler']:
         if config['training']['lr_scheduler'] == 'ReduceLROnPlateau':
@@ -439,23 +439,23 @@ def main():
         )
         print(f"Trainloss: {train_loss:.4f}")
         
-        # 验证
+        # Verify
         if (epoch + 1) % config['logging']['val_interval'] == 0:
             val_loss = validate(model, val_dataloader, loss_fn, device)
-            print(f"验证loss: {val_loss:.4f}")
+            print(f"Verifyloss: {val_loss:.4f}")
             
             # 更新learning ratescheduler
             if scheduler is not None:
                 scheduler.step(val_loss)
             
-            # save最佳模型
+            # save最佳Model
             if val_loss < best_val_loss:
                 best_val_loss = val_loss
                 torch.save(
                     model.state_dict(),
                     config['checkpoint']['best_model_path']
                 )
-                print(f"save最佳模型: {config['checkpoint']['best_model_path']}")
+                print(f"save最佳Model: {config['checkpoint']['best_model_path']}")
         
         # 定期savecheckpoint
         if (epoch + 1) % config['checkpoint']['save_interval'] == 0:
@@ -467,7 +467,7 @@ def main():
             print(f"savecheckpoint: {checkpoint_path}")
     
     print("\nTrainComplete！")
-    print(f"最佳验证loss: {best_val_loss:.4f}")
+    print(f"最佳Verifyloss: {best_val_loss:.4f}")
 
 
 if __name__ == "__main__":

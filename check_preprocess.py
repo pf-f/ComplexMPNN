@@ -2,7 +2,7 @@
 """
 check_preprocess.py
 
-Function：验证预Processing结果，包括interface_mask和数据集Split是否符合要求
+Function：Verify预Processing结果，包括interface_mask和Data集Split是否符合要求
 
 Dependencies：
 - numpy
@@ -20,75 +20,75 @@ import torch
 
 def check_interface_masks(mpnn_dir):
     """
-    检查interface_mask是否符合要求
+    Checkinterface_mask是否符合要求
     
     Args:
         mpnn_dir: MPNN .ptfiledirectory
     """
-    print("检查interface_mask...")
+    print("Checkinterface_mask...")
     
-    # 获取所有MPNN .ptfile
+    # 获取AllMPNN .ptfile
     mpnn_files = []
     for file in os.listdir(mpnn_dir):
         if file.endswith('.pt'):
             mpnn_files.append(os.path.join(mpnn_dir, file))
     
-    print(f"共检查 {len(mpnn_files)} 个MPNN .ptfile")
+    print(f"共Check {len(mpnn_files)} 个MPNN .ptfile")
     
-    # 检查每个file
+    # Check每个file
     for mpnn_file in mpnn_files:
         try:
             # loadfile
             data = torch.load(mpnn_file)
             
-            # 检查是否包含interface_mask字段
+            # Check是否包含interface_mask字段
             if 'interface_mask' not in data:
                 print(f"❌ {os.path.basename(mpnn_file)} 缺少interface_mask字段")
                 continue
             
-            # 检查interface_mask类型
+            # Checkinterface_mask类型
             interface_mask = data['interface_mask']
             if not isinstance(interface_mask, torch.Tensor):
                 print(f"❌ {os.path.basename(mpnn_file)} interface_mask类型Error，应为torch.Tensor")
                 continue
             
-            # 检查interface_mask形状
+            # Checkinterface_maskShape
             if interface_mask.dim() != 1:
                 print(f"❌ {os.path.basename(mpnn_file)} interface_mask维度Error，应为1维")
                 continue
             
-            # 检查interface_mask长度是否与sequence长度匹配
+            # Checkinterface_mask长度是否与sequence长度匹配
             if 'sequence' in data:
                 sequence_length = len(data['sequence'])
                 if len(interface_mask) != sequence_length:
                     print(f"❌ {os.path.basename(mpnn_file)} interface_mask长度与sequence长度不匹配")
                     continue
             
-            # 检查interface_mask数据类型
+            # Checkinterface_maskData类型
             if interface_mask.dtype != torch.bool:
-                print(f"❌ {os.path.basename(mpnn_file)} interface_mask数据类型Error，应为bool")
+                print(f"❌ {os.path.basename(mpnn_file)} interface_maskData类型Error，应为bool")
                 continue
             
-            print(f"✅ {os.path.basename(mpnn_file)} interface_mask检查通过")
+            print(f"✅ {os.path.basename(mpnn_file)} interface_maskCheckPassed")
         except Exception as e:
-            print(f"❌ 检查 {os.path.basename(mpnn_file)} 时出错：{str(e)}")
+            print(f"❌ Check {os.path.basename(mpnn_file)} 时出错：{str(e)}")
 
 
 def check_dataset_splits(split_dir):
     """
-    检查数据集Split是否符合要求
+    CheckData集Split是否符合要求
     
     Args:
-        split_dir: 数据集Splitfiledirectory
+        split_dir: Data集Splitfiledirectory
     """
-    print("\n检查数据集Split...")
+    print("\nCheckData集Split...")
     
-    # 检查是否存在三个Splitfile
+    # Check是否Exists三个Splitfile
     split_files = ['train.txt', 'val.txt', 'test.txt']
     for split_file in split_files:
         file_path = os.path.join(split_dir, split_file)
         if not os.path.exists(file_path):
-            print(f"❌ {split_file} file不存在")
+            print(f"❌ {split_file} file不Exists")
             return
     
     # 读取三个Splitfile
@@ -105,14 +105,14 @@ def check_dataset_splits(split_dir):
     with open(os.path.join(split_dir, 'test.txt'), 'r') as f:
         test_files = [line.strip() for line in f if line.strip()]
     
-    # 检查file数量
+    # CheckfileCount
     total_files = len(train_files) + len(val_files) + len(test_files)
     print(f"Train集: {len(train_files)} 个样本")
     print(f"val: {len(val_files)} 个样本")
     print(f"test: {len(test_files)} 个样本")
     print(f"总样本数: {total_files} 个")
     
-    # 检查是否有重叠
+    # Check是否有重叠
     train_set = set(train_files)
     val_set = set(val_files)
     test_set = set(test_files)
@@ -122,21 +122,21 @@ def check_dataset_splits(split_dir):
     overlap_val_test = val_set.intersection(test_set)
     
     if overlap_train_val:
-        print(f"❌ Train集和验证集有重叠：{overlap_train_val}")
+        print(f"❌ Train集和Verify集有重叠：{overlap_train_val}")
     else:
-        print("✅ Train集和验证集无重叠")
+        print("✅ Train集和Verify集无重叠")
     
     if overlap_train_test:
-        print(f"❌ Train集和测试集有重叠：{overlap_train_test}")
+        print(f"❌ Train集和Test集有重叠：{overlap_train_test}")
     else:
-        print("✅ Train集和测试集无重叠")
+        print("✅ Train集和Test集无重叠")
     
     if overlap_val_test:
-        print(f"❌ 验证集和测试集有重叠：{overlap_val_test}")
+        print(f"❌ Verify集和Test集有重叠：{overlap_val_test}")
     else:
-        print("✅ 验证集和测试集无重叠")
+        print("✅ Verify集和Test集无重叠")
     
-    # 检查比例
+    # Check比例
     if total_files > 0:
         train_ratio = len(train_files) / total_files
         val_ratio = len(val_files) / total_files
@@ -146,34 +146,34 @@ def check_dataset_splits(split_dir):
         print(f"val比例: {val_ratio:.2f}")
         print(f"test比例: {test_ratio:.2f}")
         
-        # 检查比例是否接近7:2:1
+        # Check比例是否接近7:2:1
         if abs(train_ratio - 0.7) < 0.1 and abs(val_ratio - 0.2) < 0.1 and abs(test_ratio - 0.1) < 0.1:
-            print("✅ 数据集比例接近7:2:1")
+            print("✅ Data集比例接近7:2:1")
         else:
-            print("⚠️  数据集比例与7:2:1有较大偏差")
+            print("⚠️  Data集比例与7:2:1有较大偏差")
 
 
 def main():
     """
-    主函数
+    主Function
     """
-    parser = argparse.ArgumentParser(description='验证预Processing结果')
+    parser = argparse.ArgumentParser(description='Verify预Processing结果')
     parser.add_argument('--mpnn_dir', default='data/processed/mpnn_pt', help='MPNN .ptfiledirectory')
-    parser.add_argument('--split_dir', default='data/splits', help='数据集Splitfiledirectory')
+    parser.add_argument('--split_dir', default='data/splits', help='Data集Splitfiledirectory')
     
     args = parser.parse_args()
     
-    # 检查interface_mask
+    # Checkinterface_mask
     if os.path.exists(args.mpnn_dir):
         check_interface_masks(args.mpnn_dir)
     else:
-        print(f"⚠️  {args.mpnn_dir} directory不存在，Skipinterface_mask检查")
+        print(f"⚠️  {args.mpnn_dir} directory不Exists，Skipinterface_maskCheck")
     
-    # 检查数据集Split
+    # CheckData集Split
     if os.path.exists(args.split_dir):
         check_dataset_splits(args.split_dir)
     else:
-        print(f"⚠️  {args.split_dir} directory不存在，Skip数据集Split检查")
+        print(f"⚠️  {args.split_dir} directory不Exists，SkipData集SplitCheck")
 
 
 if __name__ == "__main__":
