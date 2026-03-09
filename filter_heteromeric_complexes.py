@@ -2,17 +2,17 @@
 """
 filter_heteromeric_complexes.py
 
-功能：筛选符合条件的异源复合物
+Function：筛选Meets criteria的heteromeric complexes
 
-核心规则：
-1. 分辨率≤3.5Å
-2. 至少2条不同序列蛋白链
-3. 排除DNA/RNA的复合物
+Core Rules：
+1. resolution≤3.5Å
+2. 至少2条不同sequence蛋白chain
+3. ExcludeDNA/RNA的复合物
 
-依赖：
+Dependencies：
 - biopython
 
-使用方法：
+Usage：
 python filter_heteromeric_complexes.py --input_dir pdb_files --output_dir filtered_complexes
 """
 
@@ -22,48 +22,48 @@ from Bio.PDB import PDBParser, MMCIFParser
 from Bio.PDB.PDBExceptions import PDBConstructionWarning
 import warnings
 
-# 忽略PDB结构构建警告
+# 忽略PDB结构BuildWarning
 warnings.filterwarnings('ignore', category=PDBConstructionWarning)
 
 
 def get_resolution(pdb_file):
     """
-    从PDB文件中获取分辨率
+    从PDBfile中获取resolution
     
     Args:
-        pdb_file: PDB文件路径
+        pdb_file: PDBfile路径
     
     Returns:
-        分辨率值，如果无法获取则返回None
+        resolution值，如果Failed to get则返回None
     """
     try:
         if pdb_file.endswith('.cif'):
             parser = MMCIFParser()
             structure = parser.get_structure('structure', pdb_file)
-            # 从header中获取分辨率
+            # 从header中获取resolution
             if 'resolution' in structure.header:
                 return structure.header['resolution']
         else:
             parser = PDBParser()
             structure = parser.get_structure('structure', pdb_file)
-            # 从header中获取分辨率
+            # 从header中获取resolution
             if 'resolution' in structure.header:
                 return structure.header['resolution']
         return None
     except Exception as e:
-        print(f"获取 {pdb_file} 分辨率时出错：{str(e)}")
+        print(f"获取 {pdb_file} resolution时出错：{str(e)}")
         return None
 
 
 def get_chain_sequences(structure):
     """
-    获取结构中所有链的序列
+    获取结构中所有chain的sequence
     
     Args:
         structure: PDB结构对象
     
     Returns:
-        字典，键为链ID，值为序列
+        字典，键为chainID，值为sequence
     """
     chain_sequences = {}
     
@@ -71,11 +71,11 @@ def get_chain_sequences(structure):
         for chain in model:
             sequence = []
             for residue in chain:
-                # 排除水和配体
+                # Exclude水和配体
                 if residue.id[0] == ' ' and residue.get_resname() not in ['HOH', 'WAT']:
-                    # 获取氨基酸名称
+                    # 获取amino acid名称
                     resname = residue.get_resname()
-                    # 简单的氨基酸三字母到单字母的转换
+                    # 简单的amino acid三字母到单字母的转换
                     aa_dict = {
                         'ALA': 'A', 'ARG': 'R', 'ASN': 'N', 'ASP': 'D', 'CYS': 'C',
                         'GLN': 'Q', 'GLU': 'E', 'GLY': 'G', 'HIS': 'H', 'ILE': 'I',
@@ -92,13 +92,13 @@ def get_chain_sequences(structure):
 
 def has_nucleic_acids(structure):
     """
-    检查结构中是否包含DNA/RNA
+    检查结构中是否Contains DNA/RNA
     
     Args:
         structure: PDB结构对象
     
     Returns:
-        bool: 如果包含DNA/RNA则返回True，否则返回False
+        bool: 如果Contains DNA/RNA则返回True，否则返回False
     """
     nucleic_acid_residues = ['A', 'T', 'C', 'G', 'U', 'DA', 'DT', 'DC', 'DG', 'DU']
     
@@ -115,52 +115,52 @@ def has_nucleic_acids(structure):
 
 def filter_complex(pdb_file):
     """
-    筛选符合条件的复合物
+    筛选Meets criteria的复合物
     
     Args:
-        pdb_file: PDB文件路径
+        pdb_file: PDBfile路径
     
     Returns:
-        bool: 如果符合条件则返回True，否则返回False
+        bool: 如果Meets criteria则返回True，否则返回False
     """
     try:
-        # 解析PDB文件
+        # 解析PDBfile
         if pdb_file.endswith('.cif'):
             parser = MMCIFParser()
         else:
             parser = PDBParser()
         structure = parser.get_structure('structure', pdb_file)
         
-        # 检查是否包含DNA/RNA
+        # 检查是否Contains DNA/RNA
         if has_nucleic_acids(structure):
-            print(f"{pdb_file} 包含DNA/RNA，排除")
+            print(f"{pdb_file} Contains DNA/RNA，Exclude")
             return False
         
-        # 获取分辨率
+        # 获取resolution
         resolution = get_resolution(pdb_file)
         if resolution is None:
-            print(f"{pdb_file} 无法获取分辨率，继续处理")
+            print(f"{pdb_file} Failed to getresolution，ContinueProcessing")
         elif resolution > 3.5:
-            print(f"{pdb_file} 分辨率 {resolution}Å > 3.5Å，警告但继续处理")
+            print(f"{pdb_file} resolution {resolution}Å > 3.5Å，Warning但ContinueProcessing")
         
-        # 获取链序列
+        # 获取chainsequence
         chain_sequences = get_chain_sequences(structure)
         
-        # 检查至少2条不同序列的蛋白链
+        # 检查至少2条不同sequence的蛋白chain
         if len(chain_sequences) < 2:
-            print(f"{pdb_file} 蛋白链数量 < 2，排除")
+            print(f"{pdb_file} 蛋白chain数量 < 2，Exclude")
             return False
         
-        # 检查是否有不同的序列
+        # 检查是否有不同的sequence
         unique_sequences = set(chain_sequences.values())
         if len(unique_sequences) < 2:
-            print(f"{pdb_file} 没有不同序列的蛋白链，排除")
+            print(f"{pdb_file} 没有不同sequence的蛋白chain，Exclude")
             return False
         
-        print(f"{pdb_file} 符合条件")
+        print(f"{pdb_file} Meets criteria")
         return True
     except Exception as e:
-        print(f"处理 {pdb_file} 时出错：{str(e)}")
+        print(f"Processing {pdb_file} 时出错：{str(e)}")
         return False
 
 
@@ -168,33 +168,33 @@ def main():
     """
     主函数
     """
-    parser = argparse.ArgumentParser(description='筛选符合条件的异源复合物')
-    parser.add_argument('--input_dir', required=True, help='输入PDB文件目录')
-    parser.add_argument('--output_dir', default='filtered_complexes', help='输出目录')
+    parser = argparse.ArgumentParser(description='筛选Meets criteria的heteromeric complexes')
+    parser.add_argument('--input_dir', required=True, help='inputPDBfiledirectory')
+    parser.add_argument('--output_dir', default='filtered_complexes', help='outputdirectory')
     
     args = parser.parse_args()
     
-    # 确保输出目录存在
+    # 确保outputdirectory存在
     os.makedirs(args.output_dir, exist_ok=True)
     
-    # 获取输入目录中的PDB文件
+    # 获取inputdirectory中的PDBfile
     pdb_files = []
     for file in os.listdir(args.input_dir):
         if file.endswith('.pdb') or file.endswith('.cif'):
             pdb_files.append(os.path.join(args.input_dir, file))
     
-    print(f"开始处理 {len(pdb_files)} 个PDB文件")
+    print(f"StartProcessing {len(pdb_files)} 个PDBfile")
     
-    # 筛选符合条件的复合物
+    # 筛选Meets criteria的复合物
     for pdb_file in pdb_files:
         if filter_complex(pdb_file):
-            # 复制到输出目录
+            # 复制到outputdirectory
             output_file = os.path.join(args.output_dir, os.path.basename(pdb_file))
             import shutil
             shutil.copy2(pdb_file, output_file)
-            print(f"已复制到 {output_file}")
+            print(f"Copied to {output_file}")
     
-    print("筛选完成")
+    print("筛选Complete")
 
 
 if __name__ == "__main__":

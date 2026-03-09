@@ -2,17 +2,17 @@
 """
 detect_interfaces.py
 
-功能：检测蛋白质复合物中的界面残基
+Function：Detectprotein complexes中的interface residues
 
-核心规则：
-1. 界面残基定义为Cβ-Cβ<8Å（Gly用Cα）
-2. 输出npy格式的interface_mask
+Core Rules：
+1. interface residues定义为Cβ-Cβ<8Å（Gly用Cα）
+2. outputnpy格式的interface_mask
 
-依赖：
+Dependencies：
 - biopython
 - numpy
 
-使用方法：
+Usage：
 python detect_interfaces.py --input_dir filtered_complexes --output_dir data/processed/interface_masks
 """
 
@@ -23,16 +23,16 @@ from Bio.PDB import PDBParser, MMCIFParser
 from Bio.PDB.PDBExceptions import PDBConstructionWarning
 import warnings
 
-# 忽略PDB结构构建警告
+# 忽略PDB结构BuildWarning
 warnings.filterwarnings('ignore', category=PDBConstructionWarning)
 
 
 def get_atom_coordinates(residue):
     """
-    获取残基的Cβ原子坐标（Gly使用Cα）
+    获取residue的Cβ原子坐标（Gly使用Cα）
     
     Args:
-        residue: PDB残基对象
+        residue: PDBresidue对象
     
     Returns:
         原子坐标（x, y, z），如果没有则返回None
@@ -42,7 +42,7 @@ def get_atom_coordinates(residue):
             # Gly使用Cα
             atom = residue['CA']
         else:
-            # 其他氨基酸使用Cβ
+            # 其他amino acid使用Cβ
             atom = residue['CB']
         return atom.get_coord()
     except KeyError:
@@ -66,23 +66,23 @@ def calculate_distance(coord1, coord2):
 
 def detect_interface(structure):
     """
-    检测复合物中的界面残基
+    Detect复合物中的interface residues
     
     Args:
         structure: PDB结构对象
     
     Returns:
-        字典，键为链ID，值为界面残基掩码（numpy数组）
+        字典，键为chainID，值为interface residues掩码（numpy数组）
     """
-    # 获取所有链
+    # 获取所有chain
     chains = list(structure.get_chains())
     num_chains = len(chains)
     
-    # 如果链数小于2，返回空字典
+    # 如果chain数小于2，返回空字典
     if num_chains < 2:
         return {}
     
-    # 为每个链创建残基列表和坐标列表
+    # 为每个chain创建residue列表和坐标列表
     chain_residues = {}
     chain_coords = {}
     
@@ -90,7 +90,7 @@ def detect_interface(structure):
         residues = []
         coords = []
         for residue in chain:
-            # 排除水和配体
+            # Exclude水和配体
             if residue.id[0] == ' ' and residue.get_resname() not in ['HOH', 'WAT']:
                 residues.append(residue)
                 coord = get_atom_coordinates(residue)
@@ -98,7 +98,7 @@ def detect_interface(structure):
         chain_residues[chain.id] = residues
         chain_coords[chain.id] = coords
     
-    # 检测界面残基
+    # Detectinterface residues
     interface_masks = {}
     
     for i, chain1 in enumerate(chains):
@@ -109,7 +109,7 @@ def detect_interface(structure):
         # 初始化界面掩码
         mask = np.zeros(len(chain1_residues), dtype=bool)
         
-        # 检查与其他链的距离
+        # 检查与其他chain的距离
         for j, chain2 in enumerate(chains):
             if i == j:
                 continue
@@ -117,7 +117,7 @@ def detect_interface(structure):
             chain2_id = chain2.id
             chain2_coords = chain_coords[chain2_id]
             
-            # 计算链1中每个残基与链2中所有残基的距离
+            # 计算chain1中每个residue与chain2中所有residue的距离
             for k, coord1 in enumerate(chain1_coords):
                 if coord1 is None:
                     continue
@@ -129,7 +129,7 @@ def detect_interface(structure):
                     distance = calculate_distance(coord1, coord2)
                     if distance < 8.0:
                         mask[k] = True
-                        break  # 找到一个满足条件的残基就可以停止
+                        break  # 找到一个满足条件的residue就可以停止
         
         interface_masks[chain1_id] = mask
     
@@ -140,47 +140,47 @@ def main():
     """
     主函数
     """
-    parser = argparse.ArgumentParser(description='检测蛋白质复合物中的界面残基')
-    parser.add_argument('--input_dir', required=True, help='输入PDB文件目录')
-    parser.add_argument('--output_dir', default='data/processed/interface_masks', help='输出目录')
+    parser = argparse.ArgumentParser(description='Detectprotein complexes中的interface residues')
+    parser.add_argument('--input_dir', required=True, help='inputPDBfiledirectory')
+    parser.add_argument('--output_dir', default='data/processed/interface_masks', help='outputdirectory')
     
     args = parser.parse_args()
     
-    # 确保输出目录存在
+    # 确保outputdirectory存在
     os.makedirs(args.output_dir, exist_ok=True)
     
-    # 获取输入目录中的PDB文件
+    # 获取inputdirectory中的PDBfile
     pdb_files = []
     for file in os.listdir(args.input_dir):
         if file.endswith('.pdb') or file.endswith('.cif'):
             pdb_files.append(os.path.join(args.input_dir, file))
     
-    print(f"开始处理 {len(pdb_files)} 个PDB文件")
+    print(f"StartProcessing {len(pdb_files)} 个PDBfile")
     
-    # 处理每个PDB文件
+    # Processing每个PDBfile
     for pdb_file in pdb_files:
         try:
-            # 解析PDB文件
+            # 解析PDBfile
             if pdb_file.endswith('.cif'):
                 parser = MMCIFParser()
             else:
                 parser = PDBParser()
             structure = parser.get_structure('structure', pdb_file)
             
-            # 检测界面残基
+            # Detectinterface residues
             interface_masks = detect_interface(structure)
             
-            # 保存界面掩码
-            pdb_id = os.path.basename(pdb_file).split('_')[0]  # 假设文件名格式为 {pdb_id}_assembly1.pdb
+            # save界面掩码
+            pdb_id = os.path.basename(pdb_file).split('_')[0]  # 假设file名格式为 {pdb_id}_assembly1.pdb
             
             for chain_id, mask in interface_masks.items():
                 output_file = os.path.join(args.output_dir, f"{pdb_id}_{chain_id}.npy")
                 np.save(output_file, mask)
-                print(f"已保存 {output_file}")
+                print(f"已save {output_file}")
         except Exception as e:
-            print(f"处理 {pdb_file} 时出错：{str(e)}")
+            print(f"Processing {pdb_file} 时出错：{str(e)}")
     
-    print("界面检测完成")
+    print("界面DetectComplete")
 
 
 if __name__ == "__main__":

@@ -2,9 +2,9 @@
 """
 check_evaluation.py
 
-功能：验证评估模块的各个功能是否正常工作
+Function：验证Evaluate模块的各个Function是否正常工作
 
-使用方法：
+Usage：
 python check_evaluation.py
 """
 
@@ -17,8 +17,8 @@ import shutil
 
 
 def check_loss_functions():
-    """测试指标计算函数"""
-    print("=== 测试指标计算函数 ===")
+    """测试Metric计算函数"""
+    print("=== 测试Metric计算函数 ===")
     
     # 测试RMSD计算
     from run_af_multimer import calculate_rmsd
@@ -26,13 +26,13 @@ def check_loss_functions():
     coords2 = np.array([[0.1, 0.1, 0], [1.1, 0.1, 0], [0.1, 1.1, 0]])
     rmsd = calculate_rmsd(coords1, coords2)
     print(f"RMSD计算: {rmsd:.4f}")
-    assert 0.1 < rmsd < 0.2, f"RMSD计算错误: {rmsd}"
+    assert 0.1 < rmsd < 0.2, f"RMSD计算Error: {rmsd}"
     
     # 测试TM-score计算
     from run_af_multimer import calculate_tm_score
     tm_score = calculate_tm_score(coords1, coords2, seq_len=3)
     print(f"TM-score计算: {tm_score:.4f}")
-    assert 0 < tm_score <= 1, f"TM-score计算错误: {tm_score}"
+    assert 0 < tm_score <= 1, f"TM-score计算Error: {tm_score}"
     
     # 测试ipTM计算
     from run_af_multimer import calculate_iptm
@@ -40,15 +40,15 @@ def check_loss_functions():
     chain_coords2 = {'A': coords2, 'B': coords2 + 5}
     iptm = calculate_iptm(chain_coords1, chain_coords2)
     print(f"ipTM计算: {iptm:.4f}")
-    assert 0 < iptm <= 1, f"ipTM计算错误: {iptm}"
+    assert 0 < iptm <= 1, f"ipTM计算Error: {iptm}"
     
-    print("✅ 指标计算函数测试通过！\n")
+    print("✅ Metric计算函数测试通过！\n")
     return True
 
 
 def check_sequence_recovery():
-    """测试序列恢复计算"""
-    print("=== 测试序列恢复计算 ===")
+    """测试sequence恢复计算"""
+    print("=== 测试sequence恢复计算 ===")
     
     from interface_recovery import calculate_sequence_recovery
     from train_complex_mpnn import ProteinMPNNWrapper, set_random_seed, load_config, ComplexMPNNDataSet
@@ -60,10 +60,10 @@ def check_sequence_recovery():
     device = torch.device('cpu')
     model = model.to(device)
     
-    # 加载真实配置
+    # load真实配置
     config = load_config('config.yaml')
     
-    # 检查是否有真实数据可用，否则跳过完整测试
+    # 检查是否有真实数据可用，否则Skip完整测试
     test_file = os.path.join(config['data']['split_dir'], config['data']['test_split'])
     if os.path.exists(test_file):
         print("使用真实数据进行测试...")
@@ -93,9 +93,9 @@ def check_sequence_recovery():
         assert 0 <= results['non_interface_recovery'] <= 1
         assert 0 <= results['overall_recovery'] <= 1
     else:
-        print("无真实数据，跳过完整测试（函数已通过导入测试）")
+        print("无真实数据，Skip完整测试（函数已通过导入测试）")
     
-    print("✅ 序列恢复计算测试通过！\n")
+    print("✅ sequence恢复计算测试通过！\n")
     return True
 
 
@@ -105,7 +105,7 @@ def check_af_multimer():
     
     from run_af_multimer import predict_structure_with_af_multimer, evaluate_structure_quality
     
-    # 创建临时目录
+    # 创建临时directory
     with tempfile.TemporaryDirectory() as tmpdir:
         # 测试预测函数
         sequences = ["ACDEFGHIKLMNPQRSTVWY", "YWVTSRQPNMLKIHGFEDCA"]
@@ -117,9 +117,9 @@ def check_af_multimer():
         assert 'predicted_pdb' in results
         assert os.path.exists(results['predicted_pdb'])
         
-        print(f"预测完成，RMSD: {results['rmsd']:.3f}")
+        print(f"预测Complete，RMSD: {results['rmsd']:.3f}")
         
-        # 测试评估函数
+        # 测试Evaluate函数
         num_residues = sum(len(seq) for seq in sequences)
         predicted_coords = np.random.randn(num_residues, 3)
         native_coords = predicted_coords + np.random.randn(num_residues, 3) * 0.5
@@ -140,7 +140,7 @@ def check_analyze_results():
     
     from analyze_results import plot_sequence_recovery_comparison, plot_af_metrics, export_to_csv
     
-    # 创建临时目录
+    # 创建临时directory
     with tempfile.TemporaryDirectory() as tmpdir:
         # 创建模拟数据
         parsed_recovery = {
@@ -174,24 +174,24 @@ def check_analyze_results():
 
 def main():
     """主函数"""
-    print("开始验证评估模块...\n")
+    print("Start验证Evaluate模块...\n")
     
     all_passed = True
     
-    # 测试指标计算
+    # 测试Metric计算
     try:
         if not check_loss_functions():
             all_passed = False
     except Exception as e:
-        print(f"❌ 指标计算测试失败: {e}")
+        print(f"❌ Metric计算测试Failed: {e}")
         all_passed = False
     
-    # 测试序列恢复
+    # 测试sequence恢复
     try:
         if not check_sequence_recovery():
             all_passed = False
     except Exception as e:
-        print(f"❌ 序列恢复测试失败: {e}")
+        print(f"❌ sequence恢复测试Failed: {e}")
         import traceback
         traceback.print_exc()
         all_passed = False
@@ -201,7 +201,7 @@ def main():
         if not check_af_multimer():
             all_passed = False
     except Exception as e:
-        print(f"❌ AF-Multimer测试失败: {e}")
+        print(f"❌ AF-Multimer测试Failed: {e}")
         import traceback
         traceback.print_exc()
         all_passed = False
@@ -211,15 +211,15 @@ def main():
         if not check_analyze_results():
             all_passed = False
     except Exception as e:
-        print(f"❌ 结果分析测试失败: {e}")
+        print(f"❌ 结果分析测试Failed: {e}")
         import traceback
         traceback.print_exc()
         all_passed = False
     
     if all_passed:
-        print("🎉 所有检查通过！评估模块验证成功！")
+        print("🎉 所有检查通过！Evaluate模块验证Success！")
     else:
-        print("❌ 部分检查失败，请检查错误信息")
+        print("❌ 部分检查Failed，请检查Error信息")
         sys.exit(1)
 
 

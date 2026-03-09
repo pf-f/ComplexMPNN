@@ -29,13 +29,13 @@ def main():
     pdb_ids = generate_pdb_ids()
     print(f"共生成 {len(pdb_ids)} 个PDB ID")
     
-    # 保存到文件
+    # save到file
     output_file = "large_pdb_ids.txt"
     with open(output_file, 'w') as f:
         for pdb_id in pdb_ids:
             f.write(f"{pdb_id}\n")
     
-    print(f"已保存到 {output_file}")
+    print(f"已save到 {output_file}")
 
 if __name__ == "__main__":
     main()

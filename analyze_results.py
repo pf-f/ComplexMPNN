@@ -2,18 +2,18 @@
 """
 analyze_results.py
 
-功能：解析评估结果、生成可视化（指标对比柱状图）、导出CSV格式
+Function：解析Evaluate结果、生成可视化（Metric对比柱状图）、导出CSV格式
 
-核心规则：
+Core Rules：
 1. 解析 sequence_recovery_results.pt 和 af_multimer_results.pt
-2. 生成指标对比柱状图
+2. 生成Metric对比柱状图
 3. 导出CSV格式结果
-4. 保存结果到 logs/evaluation/ 目录
+4. save结果到 logs/evaluation/ directory
 
-使用方法：
+Usage：
 python analyze_results.py --recovery_path logs/evaluation/sequence_recovery_results.pt --af_path logs/evaluation/af_output/af_multimer_results.pt
 
-依赖说明：
+Dependencies说明：
 - matplotlib/seaborn: 用于可视化
 - pandas: 用于CSV导出
 """
@@ -31,15 +31,15 @@ import seaborn as sns
 
 def parse_sequence_recovery_results(results_path):
     """
-    解析序列恢复结果
+    解析sequence恢复结果
     
     Args:
-        results_path: sequence_recovery_results.pt 文件路径
+        results_path: sequence_recovery_results.pt file路径
         
     Returns:
         解析后的结果字典
     """
-    print(f"解析序列恢复结果: {results_path}")
+    print(f"解析sequence恢复结果: {results_path}")
     results = torch.load(results_path, weights_only=False)
     
     complex_results = results['complex_mpnn']
@@ -67,7 +67,7 @@ def parse_af_multimer_results(results_path):
     解析AlphaFold-Multimer结果
     
     Args:
-        results_path: af_multimer_results.pt 文件路径
+        results_path: af_multimer_results.pt file路径
         
     Returns:
         解析后的结果字典
@@ -91,13 +91,13 @@ def parse_af_multimer_results(results_path):
 
 def plot_sequence_recovery_comparison(parsed_data, output_dir):
     """
-    绘制序列恢复指标对比柱状图
+    绘制sequence恢复Metric对比柱状图
     
     Args:
-        parsed_data: 解析后的序列恢复数据
-        output_dir: 输出目录
+        parsed_data: 解析后的sequence恢复数据
+        output_dir: outputdirectory
     """
-    print("生成序列恢复指标对比图...")
+    print("生成sequence恢复Metric对比图...")
     
     metrics = parsed_data['metrics']
     complex_vals = parsed_data['ComplexMPNN']
@@ -135,18 +135,18 @@ def plot_sequence_recovery_comparison(parsed_data, output_dir):
     output_path = os.path.join(output_dir, 'sequence_recovery_comparison.png')
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     plt.close()
-    print(f"图表已保存: {output_path}")
+    print(f"图表已save: {output_path}")
 
 
 def plot_af_metrics(parsed_data, output_dir):
     """
-    绘制AlphaFold-Multimer指标图
+    绘制AlphaFold-MultimerMetric图
     
     Args:
         parsed_data: 解析后的AF-Multimer数据
-        output_dir: 输出目录
+        output_dir: outputdirectory
     """
-    print("生成AF-Multimer指标图...")
+    print("生成AF-MultimerMetric图...")
     
     metrics = parsed_data['metrics']
     values = parsed_data['values']
@@ -171,7 +171,7 @@ def plot_af_metrics(parsed_data, output_dir):
     output_path = os.path.join(output_dir, 'af_multimer_metrics.png')
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     plt.close()
-    print(f"图表已保存: {output_path}")
+    print(f"图表已save: {output_path}")
 
 
 def export_to_csv(parsed_recovery, parsed_af, output_dir):
@@ -179,13 +179,13 @@ def export_to_csv(parsed_recovery, parsed_af, output_dir):
     将结果导出为CSV格式
     
     Args:
-        parsed_recovery: 解析后的序列恢复数据
+        parsed_recovery: 解析后的sequence恢复数据
         parsed_af: 解析后的AF-Multimer数据
-        output_dir: 输出目录
+        output_dir: outputdirectory
     """
     print("导出CSV格式结果...")
     
-    # 序列恢复结果CSV
+    # sequence恢复结果CSV
     recovery_df = pd.DataFrame({
         'Metric': parsed_recovery['metrics'],
         'ComplexMPNN': parsed_recovery['ComplexMPNN'],
@@ -194,7 +194,7 @@ def export_to_csv(parsed_recovery, parsed_af, output_dir):
     })
     recovery_csv_path = os.path.join(output_dir, 'sequence_recovery_results.csv')
     recovery_df.to_csv(recovery_csv_path, index=False)
-    print(f"序列恢复结果已导出: {recovery_csv_path}")
+    print(f"sequence恢复结果已导出: {recovery_csv_path}")
     
     # AF-Multimer结果CSV
     af_df = pd.DataFrame({
@@ -208,7 +208,7 @@ def export_to_csv(parsed_recovery, parsed_af, output_dir):
     # 综合结果CSV
     combined_data = []
     
-    # 添加序列恢复指标
+    # 添加sequence恢复Metric
     for i, metric in enumerate(parsed_recovery['metrics']):
         combined_data.append({
             'Category': 'Sequence Recovery',
@@ -218,7 +218,7 @@ def export_to_csv(parsed_recovery, parsed_af, output_dir):
             'Improvement': parsed_recovery['ComplexMPNN'][i] - parsed_recovery['Baseline'][i]
         })
     
-    # 添加AF-Multimer指标
+    # 添加AF-MultimerMetric
     for i, metric in enumerate(parsed_af['metrics']):
         combined_data.append({
             'Category': 'Structure Quality',
@@ -231,23 +231,23 @@ def export_to_csv(parsed_recovery, parsed_af, output_dir):
     combined_df = pd.DataFrame(combined_data)
     combined_csv_path = os.path.join(output_dir, 'combined_evaluation_results.csv')
     combined_df.to_csv(combined_csv_path, index=False)
-    print(f"综合评估结果已导出: {combined_csv_path}")
+    print(f"综合Evaluate结果已导出: {combined_csv_path}")
 
 
 def print_summary(parsed_recovery, parsed_af):
     """
-    打印评估结果摘要
+    打印Evaluate结果摘要
     
     Args:
-        parsed_recovery: 解析后的序列恢复数据
+        parsed_recovery: 解析后的sequence恢复数据
         parsed_af: 解析后的AF-Multimer数据
     """
     print("\n" + "="*70)
-    print("评估结果摘要")
+    print("Evaluate结果摘要")
     print("="*70)
     
-    print("\n1. 序列恢复指标:")
-    print(f"{'指标':<30} {'ComplexMPNN':<15} {'基线':<15} {'提升':<10}")
+    print("\n1. sequence恢复Metric:")
+    print(f"{'Metric':<30} {'ComplexMPNN':<15} {'Baseline':<15} {'Improvement':<10}")
     print("-" * 70)
     for i, metric in enumerate(parsed_recovery['metrics']):
         c_val = parsed_recovery['ComplexMPNN'][i]
@@ -255,7 +255,7 @@ def print_summary(parsed_recovery, parsed_af):
         improvement = c_val - b_val
         print(f"{metric:<30} {c_val:<15.4f} {b_val:<15.4f} {improvement:+.4f}")
     
-    print("\n2. 结构质量指标:")
+    print("\n2. 结构质量Metric:")
     for i, metric in enumerate(parsed_af['metrics']):
         print(f"  {metric:<20} {parsed_af['values'][i]:.4f}")
     
@@ -266,20 +266,20 @@ def main():
     """
     主函数
     """
-    parser = argparse.ArgumentParser(description='解析评估结果、生成可视化、导出CSV')
+    parser = argparse.ArgumentParser(description='解析Evaluate结果、生成可视化、导出CSV')
     parser.add_argument('--recovery_path', type=str, 
                        default='logs/evaluation/sequence_recovery_results.pt',
-                       help='序列恢复结果路径')
+                       help='sequence恢复结果路径')
     parser.add_argument('--af_path', type=str, 
                        default='logs/evaluation/af_output/af_multimer_results.pt',
                        help='AF-Multimer结果路径')
     parser.add_argument('--output_dir', type=str, 
                        default='logs/evaluation',
-                       help='输出目录')
+                       help='outputdirectory')
     
     args = parser.parse_args()
     
-    # 创建输出目录
+    # 创建outputdirectory
     os.makedirs(args.output_dir, exist_ok=True)
     
     # 解析结果
@@ -287,7 +287,7 @@ def main():
     if os.path.exists(args.recovery_path):
         parsed_recovery = parse_sequence_recovery_results(args.recovery_path)
     else:
-        print(f"警告: 序列恢复结果文件不存在: {args.recovery_path}")
+        print(f"Warning: sequence恢复结果file不存在: {args.recovery_path}")
         # 创建模拟数据用于测试
         print("使用模拟数据进行测试...")
         parsed_recovery = {
@@ -300,7 +300,7 @@ def main():
     if os.path.exists(args.af_path):
         parsed_af = parse_af_multimer_results(args.af_path)
     else:
-        print(f"警告: AF-Multimer结果文件不存在: {args.af_path}")
+        print(f"Warning: AF-Multimer结果file不存在: {args.af_path}")
         # 创建模拟数据用于测试
         print("使用模拟数据进行测试...")
         parsed_af = {
@@ -323,7 +323,7 @@ def main():
     if parsed_recovery and parsed_af:
         print_summary(parsed_recovery, parsed_af)
     
-    print("\n✅ 分析完成！")
+    print("\n✅ 分析Complete！")
 
 
 if __name__ == "__main__":
