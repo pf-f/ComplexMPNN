@@ -1,0 +1,82 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+logs/
+*.log
+
+# Checkpoints
+checkpoints/
+*.pt
+*.pth
+*.pkl
+
+# Data
+data/raw_pdb/
+data/processed/
+data/splits/
+
+# Evaluation results
+logs/evaluation/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Matplotlib cache
+.matplotlib/
+
+# Environment variables
+.env
+.env.local
+
+# Backup directories
+data_backup_*/
+logs_backup_*/
+
+# Translation scripts
+translate_to_english.py
+translate_full.py
+
+# Chinese documentation files
+release_checklist.md
+ComplexMPNN.md

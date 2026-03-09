@@ -1,0 +1,35 @@
+name: complexmpnn
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - pip
+  # 科学计算
+  - numpy>=2.0
+  - pandas>=2.0
+  - scikit-learn>=1.0
+  # 深度学习
+  - pytorch>=2.0
+  - torchvision>=0.15
+  # 数据处理
+  - pyyaml>=6.0
+  # 可视化
+  - matplotlib>=3.8
+  - seaborn>=0.13
+  # 生物信息学
+  - biopython>=1.83
+  # pip依赖
+  - pip:
+    # 其他可能需要的依赖
+    - tqdm>=4.65
+
+# 环境创建命令:
+# conda env create -f environment.yml
+#
+# 环境激活命令:
+# conda activate complexmpnn
+#
+# 环境更新命令:
+# conda env update -f environment.yml --prune
