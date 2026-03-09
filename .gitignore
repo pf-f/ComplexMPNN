@@ -68,3 +68,11 @@ Thumbs.db
 # Environment variables
 .env
 .env.local
+
+# Backup directories
+data_backup_*/
+logs_backup_*/
+
+# Translation scripts
+translate_to_english.py
+translate_full.py
